@@ -26,6 +26,7 @@ cache_path = os.path.join(_tmp, cache_folder)
 
 
 def die(msg="unknown error", ecode=1):
+    """print error message and exit script"""
     if args.suppress is False:
         print msg
     sys.exit(ecode)
@@ -39,6 +40,7 @@ def normalize_title(manga):
 
 
 def get_from_url(manga_url):
+    """read directly from url and return contents for parsing"""
     try:
         contents = urllib2.urlopen(manga_url).read()
     except urllib2.HTTPError, e:
@@ -48,6 +50,7 @@ def get_from_url(manga_url):
 
 
 def get_from_cache(cache_file):
+    """read from cache file and return contents for parsing"""
     if os.stat(cache_file).st_size == 0:
         return None
 
