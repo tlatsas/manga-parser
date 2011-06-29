@@ -78,15 +78,16 @@ def get_manga(manga_title):
     if args.verbose:
         print "=> Retrieving page source"
 
-    if os.path.isfile(cache_file):
-        contents = get_from_cache(cache_file)
-    else:
-        contents = get_from_url(manga_url)
+    if args.use_cache:
+        if os.path.isfile(cache_file):
+            contents = get_from_cache(cache_file)
+            # if cache file is empty remove and read from URL instead
+            if contents is None:
+                os.remove(cache_file)
+                contents = get_from_url(manga_url)
+            return contents
 
-    if contents is None:
-        os.remove(cache_file)
-        contents = get_from_url(manga_url)
-
+    contents = get_from_url(manga_url)
     return contents
 
 
@@ -171,11 +172,13 @@ parser = argparse.ArgumentParser(description='Parse MangaFox for manga informati
 
 parser.add_argument('-v', '--verbose', action='store_true', default=False, help='verbose output')
 parser.add_argument('-s', '--suppress', action='store_true', default=False, help='suppress error messages')
+parser.add_argument('--no-cache', dest="use_cache", action='store_false', default=True, help='disable page caching read/write')
 parser.add_argument('manga', help='manga title')
 args = parser.parse_args()
 
+if args.use_cache:
+    cache_page(args.manga)
 
-cache_page(args.manga)
 manga_list = parse_manga(args.manga)
 print_list(manga_list, reverse=True)
 
